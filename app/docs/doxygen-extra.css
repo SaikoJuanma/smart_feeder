@@ -1,0 +1,18 @@
+/* Minimal, version-robust tweaks for Doxygen HTML output */
+
+/* Improve readability */
+body {
+  line-height: 1.45;
+}
+
+/* Make code blocks a bit clearer */
+div.fragment {
+  border-radius: 8px;
+}
+
+/* Slightly wider content on large screens */
+@media (min-width: 1200px) {
+  #doc-content {
+    max-width: 1100px;
+  }
+}

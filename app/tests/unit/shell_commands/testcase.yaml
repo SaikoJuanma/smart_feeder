@@ -1,0 +1,6 @@
+
+tests:
+  smart_feeder.unit.shell_commands:
+    platform_allow: native_sim
+    tags: smart_feeder unit shell_commands
+    harness: ztest

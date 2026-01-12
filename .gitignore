@@ -68,7 +68,7 @@ checkpatch_report.txt
 format_check.txt
 
 # Documentation output
-/doxygen-out/
+app/doxygen-out/
 twister-out*/
 twister-out-coverage*/
 build/

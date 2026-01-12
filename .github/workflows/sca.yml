@@ -2,7 +2,7 @@ name: SCA (CodeChecker)
 on:
   pull_request:
   push:
-    branches: [ main, master ]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
