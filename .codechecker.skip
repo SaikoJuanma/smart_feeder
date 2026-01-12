@@ -1,0 +1,6 @@
+# Analyze only app code
++*/app/src/*
++*/app/include/*
+# Skip deps, zephyr, build artifacts, etc.
+-*
+

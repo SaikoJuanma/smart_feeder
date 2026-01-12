@@ -1,0 +1,11 @@
+manifest:
+  projects:
+    - name: zephyr
+      url: https://github.com/zephyrproject-rtos/zephyr
+      revision: v4.3.0
+      path: zephyr
+      west-commands: scripts/west-commands.yml
+      import: 
+          path-prefix: deps
+  self:
+    path: app

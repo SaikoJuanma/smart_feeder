@@ -1,0 +1,58 @@
+# Doxygen configuration for generic_template
+PROJECT_NAME           = "Smart feeder"
+PROJECT_BRIEF          = "Zephyr application template"
+OUTPUT_DIRECTORY       = doxygen-out
+
+# Input - adjust to YOUR structure
+INPUT                  = src include docs
+RECURSIVE              = YES
+FILE_PATTERNS          = *.c *.h *.md
+EXCLUDE_PATTERNS       = README.md doxygen-out/* build*
+
+# Main page (create this file)
+USE_MDFILE_AS_MAINPAGE = docs/mainpage.md
+
+# What to extract
+EXTRACT_ALL            = YES
+EXTRACT_STATIC         = YES
+EXTRACT_PRIVATE        = NO
+HIDE_UNDOC_MEMBERS     = NO
+HIDE_UNDOC_CLASSES     = NO
+
+# Warnings
+WARN_IF_UNDOCUMENTED   = YES
+WARN_IF_DOC_ERROR      = YES
+
+# Preprocessor
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = NO
+
+# Markdown support
+MARKDOWN_SUPPORT       = YES
+AUTOLINK_SUPPORT       = YES
+
+# Output
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+GENERATE_LATEX         = NO
+
+# Navigation
+GENERATE_TREEVIEW      = YES
+HTML_DYNAMIC_MENUS     = YES
+SEARCHENGINE           = YES
+
+# Graphs (requires graphviz installed)
+HAVE_DOT               = YES
+DOT_IMAGE_FORMAT       = svg
+INTERACTIVE_SVG        = YES
+CALL_GRAPH             = NO
+CALLER_GRAPH           = NO
+CLASS_DIAGRAMS         = YES
+UML_LOOK               = YES
+
+# Optional custom styling
+# HTML_EXTRA_STYLESHEET  = docs/doxygen-extra.css
+
+# Optimize for C
+OPTIMIZE_OUTPUT_FOR_C  = YES
+QUIET                  = NO
