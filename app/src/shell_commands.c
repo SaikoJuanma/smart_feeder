@@ -1,9 +1,15 @@
+/**
+ * @file: shell_commands.c
+ * @brief: Shell command handlers.
+ *
+ * Registers shell commands used by the app.
+ */
 #include <zephyr/shell/shell.h>
 #include <zephyr/logging/log.h>
 
 LOG_MODULE_REGISTER(console_shell, LOG_LEVEL_INF);
 
-/*
+/**
  * @brief: relevant info from the driver.
  *
  * Usage:
