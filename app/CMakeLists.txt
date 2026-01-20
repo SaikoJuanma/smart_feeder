@@ -8,4 +8,6 @@ target_include_directories(app PRIVATE include)
 target_sources(app PRIVATE
     src/main.c
     src/shell_commands.c
+    src/configuration.c
+    src/init.c
 )

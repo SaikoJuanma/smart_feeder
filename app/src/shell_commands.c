@@ -6,6 +6,8 @@
  */
 #include <zephyr/shell/shell.h>
 #include <zephyr/logging/log.h>
+#include <stdlib.h>
+#include "configuration.h"
 
 LOG_MODULE_REGISTER(console_shell, LOG_LEVEL_INF);
 
@@ -20,10 +22,33 @@ static int cmd_status(const struct shell *shell, size_t argc, char **argv)
     ARG_UNUSED(argc);
     ARG_UNUSED(argv);
 
-    shell_print(shell, "this should print relevant info\n");
+    shell_print(shell, "Current config: %d", cfg.random_value);
 
     return 0;
 }
 
+/**
+ * @brief: Changes the value and saves it to the nvs.
+ *
+ * Usage:
+ *   value <int>
+ */
+static int cmd_change_value(const struct shell *shell, size_t argc, char **argv)
+{
+    if (argc == 1) {
+        shell_print(shell, "Random value: %d", cfg.random_value);
+        return 0;
+    } else if (argc == 2) {
+        cfg.random_value = atoi(argv[1]);
+        shell_print(shell, "changing value to: %d", cfg.random_value);
+        save_config();
+        return 0;
+    }
+
+    shell_print(shell, "Usage: value <int>");
+    return -EINVAL;
+}
+
 /* Register shell commands */
 SHELL_CMD_REGISTER(status, NULL, "Print relevant info", cmd_status);
+SHELL_CMD_REGISTER(value, NULL, "Change the random value", cmd_change_value);

@@ -1,0 +1,5 @@
+tests:
+  smart_feeder.unit.init:
+    platform_allow: native_sim
+    tags: smart_feeder unit init
+    harness: ztest

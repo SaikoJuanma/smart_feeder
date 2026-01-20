@@ -1,4 +1,3 @@
-
 tests:
   smart_feeder.unit.shell_commands:
     platform_allow: native_sim
