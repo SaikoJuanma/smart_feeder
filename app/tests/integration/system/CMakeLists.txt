@@ -9,6 +9,7 @@ target_sources(app PRIVATE
   ../../../src/init.c
   ../../../src/configuration.c
   ../../../src/motor_control.c
+  ../../../src/check_health.c
 )
 
 target_include_directories(app PRIVATE

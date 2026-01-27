@@ -3,6 +3,7 @@
 #include "init.h"
 #include "motor_control.h"
 #include "configuration.h"
+#include "check_health.h"
 
 ZTEST(smart_feeder_integration, test_system_threads)
 {
@@ -12,6 +13,7 @@ ZTEST(smart_feeder_integration, test_system_threads)
     processes_init();
 
     start_motor_control_thread();
+    start_check_health_thread();
 
     k_msleep(1100);
 
@@ -26,6 +28,7 @@ ZTEST(smart_feeder_integration, test_system_threads)
     /* INFO: Stop test-only (prevents thread from affecting other tests) */
 #ifdef SMART_FEEDER_UNIT_TEST
     stop_motor_control_thread();
+    stop_check_health_thread();
 #endif
 }
 
