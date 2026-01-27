@@ -7,6 +7,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include "motor_control.h"
+#include "check_health.h"
 
 LOG_MODULE_REGISTER(motor_control, LOG_LEVEL_INF);
 
@@ -30,9 +31,10 @@ void motor_control_thread(void *p1, void *p2, void *p3)
     LOG_INF("Motor control started at priority: %d", MOTOR_CTRL_PRIORITY);
 
     while (1) {
+        thread_report_alive(THREAD_MOTOR_CONTROL);
         k_thread_stack_space_get(&motor_thread_data, &unused_stack);
         LOG_INF("Motor control loop. Unused Stack: %d bytes", unused_stack);
-        k_msleep(1000);
+        k_sleep(K_MSEC(500));
     }
 }
 

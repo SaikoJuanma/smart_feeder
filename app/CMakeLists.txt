@@ -12,4 +12,5 @@ target_sources(app PRIVATE
     src/init.c
     src/motor_control.c
     src/check_health.c
+    src/watchdog.c
 )

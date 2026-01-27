@@ -7,9 +7,9 @@
 #include <zephyr/logging/log.h>
 #include "init.h"
 #include "configuration.h"
+#include "watchdog.h"
 
 LOG_MODULE_REGISTER(init, LOG_LEVEL_INF);
-// TODO: add description to the file
 
 int processes_init(void)
 {
@@ -27,6 +27,12 @@ int processes_init(void)
     if (ret < 0) {
         LOG_INF("No saved config, using defaults");
         set_dflt_cfg();
+    }
+
+    ret = init_watchdog();
+    if (ret < 0) {
+        LOG_ERR("Failed to initialize watchdog, system unsafe");
+        return ret;
     }
 
     LOG_INF("Initialization complete");

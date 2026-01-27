@@ -1,15 +1,10 @@
 cmake_minimum_required(VERSION 3.20.0)
 
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
-project(smart_feeder_integration_system)
+project(smart_feeder_unit_watchdog)
 
 target_sources(app PRIVATE
-  src/test_system.c
-  ../../../src/shell_commands.c
-  ../../../src/init.c
-  ../../../src/configuration.c
-  ../../../src/motor_control.c
-  ../../../src/check_health.c
+  src/test_watchdog.c
   ../../../src/watchdog.c
 )
 
