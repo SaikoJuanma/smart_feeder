@@ -1,0 +1,5 @@
+tests:
+  smart_feeder.unit.check_health:
+    platform_allow: native_sim
+    tags: smart_feeder unit check_health
+    harness: ztest

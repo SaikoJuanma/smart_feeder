@@ -9,6 +9,9 @@
 #include <stdlib.h>
 #include "configuration.h"
 
+// TODO: commit command
+// TODO: reboot command
+
 LOG_MODULE_REGISTER(console_shell, LOG_LEVEL_INF);
 
 /**

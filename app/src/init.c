@@ -1,10 +1,16 @@
+/**
+ * @file: init.c
+ * @brief: basic initialization.
+ *
+ * All the needed hardware things should be initialized here, so we can run the threads correctly
+ */
 #include <zephyr/logging/log.h>
 #include "init.h"
 #include "configuration.h"
 
 LOG_MODULE_REGISTER(init, LOG_LEVEL_INF);
+// TODO: add description to the file
 
-// TODO: definition and unit test left
 int processes_init(void)
 {
     int ret;

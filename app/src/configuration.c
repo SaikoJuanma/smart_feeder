@@ -1,3 +1,9 @@
+/**
+ * @file: configuration.c
+ * @brief: NVS related things.
+ *
+ * Here we have all the things related to the configuration that we want on the non-volatile storage
+ */
 #include <zephyr/fs/nvs.h>
 #include <zephyr/kernel.h>
 #include <zephyr/device.h>
@@ -7,6 +13,7 @@
 #include "configuration.h"
 
 LOG_MODULE_REGISTER(configuration, LOG_LEVEL_INF);
+// TODO: add description to the file
 
 struct config cfg;
 struct nvs_fs fs;

@@ -1,0 +1,5 @@
+tests:
+  smart_feeder.unit.motor_control:
+    platform_allow: native_sim
+    tags: smart_feeder unit motor_control
+    harness: ztest

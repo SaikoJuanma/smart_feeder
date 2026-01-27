@@ -10,4 +10,6 @@ target_sources(app PRIVATE
     src/shell_commands.c
     src/configuration.c
     src/init.c
+    src/motor_control.c
+    src/check_health.c
 )
