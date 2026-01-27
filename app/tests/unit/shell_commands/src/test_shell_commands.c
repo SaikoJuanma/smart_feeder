@@ -2,6 +2,7 @@
 #include <zephyr/shell/shell.h>
 #include <zephyr/shell/shell_dummy.h>
 #include <zephyr/fff.h>
+#include <zephyr/sys/reboot.h>
 #include <string.h>
 #include "configuration.h"
 
@@ -13,6 +14,27 @@ struct config cfg;
 static struct config backup_cfg;
 
 FAKE_VALUE_FUNC(int, save_config);
+
+struct sys_reboot_fake_context {
+    int call_count;
+    int arg0_val;
+};
+
+struct sys_reboot_fake_context sys_reboot_fake;
+
+void sys_reboot(int type)
+{
+    sys_reboot_fake.call_count++;
+    sys_reboot_fake.arg0_val = type;
+
+    zassert_equal(sys_reboot_fake.call_count, 1, "sys_reboot called more than once");
+
+    ztest_test_pass();
+
+    while (1) {
+        k_sleep(K_FOREVER);
+    }
+}
 
 static int last_saved_value = 0;
 
@@ -36,6 +58,10 @@ static void console_shell_before(void *fixture)
     memcpy(&backup_cfg, &cfg, sizeof(struct config));
 
     RESET_FAKE(save_config);
+
+    sys_reboot_fake.call_count = 0;
+    sys_reboot_fake.arg0_val = 0;
+
     FFF_RESET_HISTORY();
 
     save_config_fake.custom_fake = custom_save_config;
@@ -206,4 +232,13 @@ ZTEST(console_shell, test_value_cmd_saves_config)
     zassert_equal(cfg.random_value, 555, "Config should be updated to 555 before save");
 }
 
+ZTEST(console_shell_reboot, test_reboot_cmd_output)
+{
+    shell_execute_cmd(shell_backend, "reboot");
+
+    zassert_unreachable("sys_reboot was not called!");
+}
+
 ZTEST_SUITE(console_shell, NULL, console_shell_setup, console_shell_before, console_shell_after, NULL);
+/* INFO: this should run last, because it has a destructive effect */
+ZTEST_SUITE(console_shell_reboot, NULL, console_shell_setup, console_shell_before, console_shell_after, NULL);

@@ -58,7 +58,7 @@ void stop_check_health_thread(void)
 {
     if (health_tid != NULL) {
         LOG_INF("Stopping check health thread");
-        k_thread_abort(health_id);
+        k_thread_abort(health_tid);
         health_tid = NULL;
     }
 }
