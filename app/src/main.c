@@ -8,6 +8,8 @@
 
 LOG_MODULE_REGISTER(main, LOG_LEVEL_INF);
 
+// TODO: search a way to run  test locally on our hardware instead of native sim
+// TODO: the run + code checker should run now on our hardware too
 int main(void)
 {
     /* INFO: start all the hardware related stuff */

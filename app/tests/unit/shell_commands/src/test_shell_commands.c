@@ -14,6 +14,7 @@ struct config cfg;
 static struct config backup_cfg;
 
 FAKE_VALUE_FUNC(int, save_config);
+FAKE_VOID_FUNC(set_dflt_cfg);
 
 struct sys_reboot_fake_context {
     int call_count;
@@ -58,6 +59,7 @@ static void console_shell_before(void *fixture)
     memcpy(&backup_cfg, &cfg, sizeof(struct config));
 
     RESET_FAKE(save_config);
+    RESET_FAKE(set_dflt_cfg);
 
     sys_reboot_fake.call_count = 0;
     sys_reboot_fake.arg0_val = 0;
@@ -133,11 +135,9 @@ ZTEST(console_shell, test_value_cmd_set_positive)
     zassert_equal(cfg.random_value, 999, "Config not updated. Expected 999, got %d", cfg.random_value);
 
     zassert_equal(save_config_fake.call_count,
-                  1,
-                  "save_config should be called once, was called %d times",
+                  0,
+                  "save_config should NOT be called (removed from value command), was called %d times",
                   save_config_fake.call_count);
-
-    zassert_equal(last_saved_value, 999, "save_config called with wrong value. Expected 999, got %d", last_saved_value);
 }
 
 ZTEST(console_shell, test_value_cmd_set_negative)
@@ -147,8 +147,7 @@ ZTEST(console_shell, test_value_cmd_set_negative)
 
     zassert_equal(cfg.random_value, -50, "Config not updated. Expected -50, got %d", cfg.random_value);
 
-    zassert_equal(save_config_fake.call_count, 1, "save_config should be called once");
-    zassert_equal(last_saved_value, -50, "save_config called with wrong value");
+    zassert_equal(save_config_fake.call_count, 0, "save_config should NOT be called");
 }
 
 ZTEST(console_shell, test_value_cmd_set_zero)
@@ -158,7 +157,7 @@ ZTEST(console_shell, test_value_cmd_set_zero)
 
     zassert_equal(cfg.random_value, 0, "Config not updated. Expected 0, got %d", cfg.random_value);
 
-    zassert_equal(save_config_fake.call_count, 1, "save_config should be called once");
+    zassert_equal(save_config_fake.call_count, 0, "save_config should NOT be called");
 }
 
 ZTEST(console_shell, test_value_cmd_too_many_args)
@@ -182,7 +181,7 @@ ZTEST(console_shell, test_value_cmd_invalid_arg)
 
     zassert_equal(cfg.random_value, 0, "Expected 0 (atoi behavior), got %d", cfg.random_value);
 
-    zassert_equal(save_config_fake.call_count, 1, "save_config should be called even with invalid input");
+    zassert_equal(save_config_fake.call_count, 0, "save_config should NOT be called");
 }
 
 ZTEST(console_shell, test_value_cmd_large_number)
@@ -192,45 +191,214 @@ ZTEST(console_shell, test_value_cmd_large_number)
 
     zassert_equal(cfg.random_value, 2147483647, "Config not updated correctly");
 
-    zassert_equal(save_config_fake.call_count, 1, "save_config should be called once");
-    zassert_equal(last_saved_value, 2147483647, "save_config called with wrong value");
+    zassert_equal(save_config_fake.call_count, 0, "save_config should NOT be called");
 }
 
-ZTEST(console_shell, test_value_cmd_multiple_saves)
+ZTEST(console_shell, test_value_cmd_multiple_changes)
 {
     int ret = shell_execute_cmd(shell_backend, "value 100");
     zassert_equal(ret, 0, "First command failed");
-    zassert_equal(save_config_fake.call_count, 1, "Expected 1 save call");
+    zassert_equal(save_config_fake.call_count, 0, "save_config should NOT be called");
+    zassert_equal(cfg.random_value, 100, "Config should be 100");
 
     shell_backend_dummy_clear_output(shell_backend);
 
     ret = shell_execute_cmd(shell_backend, "value 200");
     zassert_equal(ret, 0, "Second command failed");
-    zassert_equal(save_config_fake.call_count, 2, "Expected 2 save calls");
-    zassert_equal(last_saved_value, 200, "Last save should be 200");
+    zassert_equal(save_config_fake.call_count, 0, "save_config should NOT be called");
+    zassert_equal(cfg.random_value, 200, "Config should be 200");
 
     shell_backend_dummy_clear_output(shell_backend);
 
     ret = shell_execute_cmd(shell_backend, "value 300");
     zassert_equal(ret, 0, "Third command failed");
-    zassert_equal(save_config_fake.call_count, 3, "Expected 3 save calls");
-    zassert_equal(last_saved_value, 300, "Last save should be 300");
+    zassert_equal(save_config_fake.call_count, 0, "save_config should NOT be called");
+    zassert_equal(cfg.random_value, 300, "Config should be 300");
 }
 
-ZTEST(console_shell, test_value_cmd_saves_config)
+ZTEST(console_shell, test_value_cmd_does_not_save_config)
 {
     int ret = shell_execute_cmd(shell_backend, "value 555");
+    zassert_equal(ret, 0, "Command execution failed");
+
+    zassert_equal(save_config_fake.call_count,
+                  0,
+                  "save_config should NOT be called by value command, was called %d times",
+                  save_config_fake.call_count);
+
+    zassert_equal(cfg.random_value, 555, "Config should be updated to 555");
+}
+
+/* ========== COMMIT COMMAND TESTS ========== */
+
+ZTEST(console_shell, test_commit_cmd_calls_save_config)
+{
+    cfg.random_value = 777;
+
+    int ret = shell_execute_cmd(shell_backend, "commit");
     zassert_equal(ret, 0, "Command execution failed");
 
     zassert_equal(save_config_fake.call_count,
                   1,
                   "save_config should be called exactly once, was called %d times",
                   save_config_fake.call_count);
-
-    zassert_equal(last_saved_value, 555, "Expected saved value 555, got %d", last_saved_value);
-
-    zassert_equal(cfg.random_value, 555, "Config should be updated to 555 before save");
+    zassert_equal(last_saved_value, 777, "Expected saved value 777, got %d", last_saved_value);
 }
+
+ZTEST(console_shell, test_commit_cmd_output)
+{
+    size_t output_len;
+
+    int ret = shell_execute_cmd(shell_backend, "commit");
+    zassert_equal(ret, 0, "Command execution failed");
+
+    const char *output = shell_backend_dummy_get_output(shell_backend, &output_len);
+    zassert_not_null(output, "No output captured");
+    zassert_true(strstr(output, "Config saved in the NVS") != NULL,
+                 "Expected 'Config saved in the NVS' in output. Got: '%s'",
+                 output);
+}
+
+ZTEST(console_shell, test_commit_cmd_with_args_ignored)
+{
+    cfg.random_value = 888;
+
+    int ret = shell_execute_cmd(shell_backend, "commit extra args");
+    zassert_equal(ret, 0, "Command execution failed");
+
+    zassert_equal(save_config_fake.call_count, 1, "save_config should be called once");
+    zassert_equal(last_saved_value, 888, "Expected saved value 888, got %d", last_saved_value);
+}
+
+ZTEST(console_shell, test_commit_multiple_times)
+{
+    cfg.random_value = 100;
+    int ret = shell_execute_cmd(shell_backend, "commit");
+    zassert_equal(ret, 0, "First commit failed");
+    zassert_equal(save_config_fake.call_count, 1, "Expected 1 save call");
+    zassert_equal(last_saved_value, 100, "Expected saved value 100");
+
+    shell_backend_dummy_clear_output(shell_backend);
+
+    cfg.random_value = 200;
+    ret = shell_execute_cmd(shell_backend, "commit");
+    zassert_equal(ret, 0, "Second commit failed");
+    zassert_equal(save_config_fake.call_count, 2, "Expected 2 save calls");
+    zassert_equal(last_saved_value, 200, "Expected saved value 200");
+}
+
+ZTEST(console_shell, test_value_then_commit_workflow)
+{
+    cfg.random_value = 50;
+
+    int ret = shell_execute_cmd(shell_backend, "value 150");
+    zassert_equal(ret, 0, "value command failed");
+    zassert_equal(cfg.random_value, 150, "Config should be 150");
+    zassert_equal(save_config_fake.call_count, 0, "save_config should not be called by value");
+
+    shell_backend_dummy_clear_output(shell_backend);
+
+    ret = shell_execute_cmd(shell_backend, "commit");
+    zassert_equal(ret, 0, "commit command failed");
+    zassert_equal(save_config_fake.call_count, 1, "save_config should be called by commit");
+    zassert_equal(last_saved_value, 150, "Expected saved value 150");
+}
+
+/* ========== DEFAULT COMMAND TESTS ========== */
+
+ZTEST(console_shell, test_default_cmd_calls_set_dflt_cfg)
+{
+    int ret = shell_execute_cmd(shell_backend, "default");
+    zassert_equal(ret, 0, "Command execution failed");
+
+    zassert_equal(set_dflt_cfg_fake.call_count,
+                  1,
+                  "set_dflt_cfg should be called exactly once, was called %d times",
+                  set_dflt_cfg_fake.call_count);
+}
+
+ZTEST(console_shell, test_default_cmd_output)
+{
+    size_t output_len;
+
+    int ret = shell_execute_cmd(shell_backend, "default");
+    zassert_equal(ret, 0, "Command execution failed");
+
+    const char *output = shell_backend_dummy_get_output(shell_backend, &output_len);
+    zassert_not_null(output, "No output captured");
+    zassert_true(strstr(output, "Default values restored") != NULL,
+                 "Expected 'Default values restored' in output. Got: '%s'",
+                 output);
+}
+
+ZTEST(console_shell, test_default_cmd_with_args_ignored)
+{
+    int ret = shell_execute_cmd(shell_backend, "default extra args");
+    zassert_equal(ret, 0, "Command execution failed");
+
+    zassert_equal(set_dflt_cfg_fake.call_count, 1, "set_dflt_cfg should be called once");
+}
+
+ZTEST(console_shell, test_default_multiple_times)
+{
+    int ret = shell_execute_cmd(shell_backend, "default");
+    zassert_equal(ret, 0, "First default failed");
+    zassert_equal(set_dflt_cfg_fake.call_count, 1, "Expected 1 call");
+
+    shell_backend_dummy_clear_output(shell_backend);
+
+    ret = shell_execute_cmd(shell_backend, "default");
+    zassert_equal(ret, 0, "Second default failed");
+    zassert_equal(set_dflt_cfg_fake.call_count, 2, "Expected 2 calls");
+}
+
+ZTEST(console_shell, test_default_does_not_save_config)
+{
+    int ret = shell_execute_cmd(shell_backend, "default");
+    zassert_equal(ret, 0, "Command execution failed");
+
+    zassert_equal(set_dflt_cfg_fake.call_count, 1, "set_dflt_cfg should be called");
+    zassert_equal(save_config_fake.call_count, 0, "save_config should NOT be called automatically by default command");
+}
+
+ZTEST(console_shell, test_default_then_commit_workflow)
+{
+    cfg.random_value = 999;
+
+    int ret = shell_execute_cmd(shell_backend, "default");
+    zassert_equal(ret, 0, "default command failed");
+    zassert_equal(set_dflt_cfg_fake.call_count, 1, "set_dflt_cfg should be called");
+    zassert_equal(save_config_fake.call_count, 0, "save_config should not be called by default");
+
+    shell_backend_dummy_clear_output(shell_backend);
+
+    ret = shell_execute_cmd(shell_backend, "commit");
+    zassert_equal(ret, 0, "commit command failed");
+    zassert_equal(save_config_fake.call_count, 1, "save_config should be called by commit");
+}
+
+ZTEST(console_shell, test_value_default_commit_workflow)
+{
+    cfg.random_value = 0;
+
+    int ret = shell_execute_cmd(shell_backend, "value 500");
+    zassert_equal(ret, 0, "value command failed");
+    zassert_equal(cfg.random_value, 500, "Config should be 500");
+
+    shell_backend_dummy_clear_output(shell_backend);
+
+    ret = shell_execute_cmd(shell_backend, "default");
+    zassert_equal(ret, 0, "default command failed");
+    zassert_equal(set_dflt_cfg_fake.call_count, 1, "set_dflt_cfg should be called");
+
+    shell_backend_dummy_clear_output(shell_backend);
+
+    ret = shell_execute_cmd(shell_backend, "commit");
+    zassert_equal(ret, 0, "commit command failed");
+    zassert_equal(save_config_fake.call_count, 1, "save_config should be called");
+}
+
+/* ========== REBOOT TEST ========== */
 
 ZTEST(console_shell_reboot, test_reboot_cmd_output)
 {

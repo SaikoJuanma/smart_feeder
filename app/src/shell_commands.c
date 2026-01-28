@@ -45,7 +45,6 @@ static int cmd_change_value(const struct shell *shell, size_t argc, char **argv)
     } else if (argc == 2) {
         cfg.random_value = atoi(argv[1]);
         shell_print(shell, "changing value to: %d", cfg.random_value);
-        save_config();
         return 0;
     }
 
@@ -69,7 +68,41 @@ static int cmd_reboot(const struct shell *shell, size_t argc, char **argv)
     return 0;
 }
 
+/**
+ * @brief: Saves the current config in the nvs
+ *
+ * Usage:
+ *     commit
+ */
+static int cmd_commit(const struct shell *shell, size_t argc, char **argv)
+{
+    ARG_UNUSED(argc);
+    ARG_UNUSED(argv);
+
+    save_config();
+    shell_print(shell, "Config saved in the NVS");
+    return 0;
+}
+
+/**
+ * @brief: Restores the default config
+ *
+ * Usage:
+ *     default
+ */
+static int cmd_restore_dflt(const struct shell *shell, size_t argc, char **argv)
+{
+    ARG_UNUSED(argc);
+    ARG_UNUSED(argv);
+
+    set_dflt_cfg();
+    shell_print(shell, "Default values restored");
+    return 0;
+}
+
 /* Register shell commands */
 SHELL_CMD_REGISTER(status, NULL, "Print relevant info", cmd_status);
 SHELL_CMD_REGISTER(value, NULL, "Change the random value", cmd_change_value);
 SHELL_CMD_REGISTER(reboot, NULL, "Colds reboots the system", cmd_reboot);
+SHELL_CMD_REGISTER(commit, NULL, "Saves the current config in the NVS", cmd_commit);
+SHELL_CMD_REGISTER(default, NULL, "Restores the default values", cmd_restore_dflt);
