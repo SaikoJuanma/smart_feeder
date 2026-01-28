@@ -4,6 +4,7 @@
 #include "motor_control.h"
 #include "configuration.h"
 #include "check_health.h"
+#include "watchdog.h"
 
 ZTEST(smart_feeder_integration, test_system_threads)
 {
@@ -15,17 +16,16 @@ ZTEST(smart_feeder_integration, test_system_threads)
     start_motor_control_thread();
     start_check_health_thread();
 
-    k_msleep(1100);
+    for (int i = 0; i < 11; i++) {
+        k_msleep(100);
+        watchdog_feed();
+    }
+
+    watchdog_disable();
 
     zassert_true(k_uptime_get() > 0, "System should be running");
+    zassert_true(is_system_healthy(), "System reported unhealthy state");
 
-    /* TODO: When motor logic exists, exercise the thread:
-     * - Send motor commands
-     * - Verify state changes
-     * - Test different operating conditions
-     */
-
-    /* INFO: Stop test-only (prevents thread from affecting other tests) */
 #ifdef SMART_FEEDER_UNIT_TEST
     stop_motor_control_thread();
     stop_check_health_thread();
