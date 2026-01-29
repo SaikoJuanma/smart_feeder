@@ -10,11 +10,8 @@
 #include "check_health.h"
 
 LOG_MODULE_REGISTER(motor_control, LOG_LEVEL_INF);
-
-#define MOTOR_CTRL_STACK    512
-#define MOTOR_CTRL_PRIORITY 1
-
 K_THREAD_STACK_DEFINE(motor_stack_area, MOTOR_CTRL_STACK);
+
 static struct k_thread motor_thread_data;
 static k_tid_t motor_tid = NULL;
 

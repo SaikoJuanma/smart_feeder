@@ -9,10 +9,6 @@
 #include "check_health.h"
 
 LOG_MODULE_REGISTER(check_health, LOG_LEVEL_INF);
-
-#define CHECK_HEALTH_STACK    512
-#define CHECK_HEALTH_PRIORITY 5
-
 K_THREAD_STACK_DEFINE(health_stack_area, CHECK_HEALTH_STACK);
 
 /* Local prototypes */

@@ -1,0 +1,5 @@
+tests:
+  smart_feeder.unit.communication:
+    platform_allow: native_sim
+    tags: smart_feeder unit communication
+    harness: ztest

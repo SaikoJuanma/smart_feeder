@@ -4,11 +4,14 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#define CHECK_HEALTH_STACK       512
+#define CHECK_HEALTH_PRIORITY    5
 #define THREAD_TIMEOUT_MS        500
 #define HEALTH_CHECK_INTERVAL_MS 100
 
 typedef enum {
     THREAD_MOTOR_CONTROL = 0,
+    THREAD_COMMUNICATION,
     THREAD_COUNT
 } thread_id_t;
 
