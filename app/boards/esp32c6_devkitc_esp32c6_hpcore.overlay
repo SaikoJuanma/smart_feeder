@@ -1,0 +1,52 @@
+&pinctrl {
+    i2c0_default: i2c0_default {
+        group1 {
+            pinmux = <I2C0_SDA_GPIO6>,
+                     <I2C0_SCL_GPIO7>;
+            bias-pull-up;
+            drive-open-drain;
+            output-high;
+        };
+    };
+
+    spi2_default: spi2_default {
+        group1 {
+            pinmux = <SPIM2_MISO_GPIO2>,
+                     <SPIM2_MOSI_GPIO4>,
+                     <SPIM2_SCLK_GPIO5>;
+        };
+        group2 {
+            pinmux = <SPIM2_CSEL_GPIO10>;
+            output-low;
+        };
+    };
+};
+
+&i2c0 {
+    status = "okay";
+    pinctrl-0 = <&i2c0_default>;
+    pinctrl-names = "default";
+    clock-frequency = <I2C_BITRATE_STANDARD>;
+    
+    bme280: bme280@76 {
+        compatible = "bosch,bme280";
+        reg = <0x76>;
+        label = "BME280";
+    };
+};
+
+&spi2 {
+    status = "okay";
+    pinctrl-0 = <&spi2_default>;
+    pinctrl-names = "default";
+    cs-gpios = <&gpio0 10 GPIO_ACTIVE_LOW>;
+    
+    ili9341: ili9341@0 {
+        compatible = "ilitek,ili9341";
+        reg = <0>;
+        label = "ILI9341";
+        spi-max-frequency = <25000000>;
+        reset-gpios = <&gpio0 13 GPIO_ACTIVE_LOW>;
+        cmd-data-gpios = <&gpio0 12 GPIO_ACTIVE_HIGH>;
+    };
+};
